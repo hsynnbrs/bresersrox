@@ -55,11 +55,12 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         h1 { margin: 0; color: var(--primary); font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
         
+        .top-btns { display: flex; gap: 8px; }
         .theme-btn {
             background: var(--input-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 13px;
@@ -108,7 +109,7 @@
             font-size: 12px;
             cursor: pointer;
             font-weight: 600;
-            min-width: 140px;
+            min-width: 120px;
         }
         .btn-test:hover { border-color: var(--primary); background: rgba(0, 180, 216, 0.05); }
 
@@ -142,7 +143,6 @@
         }
         .btn-submit:hover { transform: translateY(-2px); filter: brightness(1.1); }
         
-        /* TARAMA ANIMASYONU */
         #loader {
             display: none;
             margin: 20px 0;
@@ -162,7 +162,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* DİNAMİK SONUÇ KARTI */
         #resultCard { 
             margin-top: 25px; 
             padding: 25px; 
@@ -195,6 +194,16 @@
 
         .details-list { text-align: left; font-size: 13.5px; margin-top: 15px; padding-left: 20px; line-height: 1.6; }
         
+        .advice-box {
+            margin-top: 15px;
+            background: rgba(0,0,0,0.25);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            text-align: left;
+            border-left: 4px solid var(--primary);
+        }
+
         .action-btns { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         .btn-action {
             background: rgba(255,255,255,0.12);
@@ -212,7 +221,6 @@
         }
         .btn-action:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
 
-        /* SON TARAMALAR AKIŞI */
         .history-section {
             margin-top: 30px;
             border-top: 1px solid var(--border-color);
@@ -237,42 +245,44 @@
     <div class="container">
         <div class="header-top">
             <h1>🛡️ PhishGuard-TR</h1>
-            <button class="theme-btn" onclick="toggleTheme()">🌙 / ☀️ Tema</button>
+            <div class="top-btns">
+                <button class="theme-btn" onclick="toggleLang()" id="langBtn">🌐 EN</button>
+                <button class="theme-btn" onclick="toggleTheme()">🌙 / ☀️</button>
+            </div>
         </div>
-        <p class="subtitle">TÜBİTAK Projesi — Akıllı Türkçe Oltalama & Link Tespit Platformu</p>
+        <p class="subtitle" id="subTitle">TÜBİTAK Projesi — Akıllı Türkçe Oltalama & Donanım Tuzağı Tespit Platformu</p>
 
-        <!-- Canlı İstatistik Paneli -->
         <div class="stats-bar">
             <div class="stat-item">
-                <div class="stat-num" id="totalScanCount">142</div>
-                <div class="stat-label">Toplam Tarama</div>
+                <div class="stat-num" id="totalScanCount">154</div>
+                <div class="stat-label" id="lblTotal">Toplam Tarama</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num" style="color:#fca5a5;" id="threatCount">48</div>
-                <div class="stat-label">Yakalanan Tehdit</div>
+                <div class="stat-num" style="color:#fca5a5;" id="threatCount">53</div>
+                <div class="stat-label" id="lblThreat">Yakalanan Tehdit</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num" style="color:#34d399;">%97.2</div>
-                <div class="stat-label">Model Doğruluğu</div>
+                <div class="stat-num" style="color:#34d399;">%97.8</div>
+                <div class="stat-label" id="lblAccuracy">Model Doğruluğu</div>
             </div>
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('all', event)">Tümünü Tara</button>
-            <button class="tab-btn" onclick="switchTab('url', event)">Sadece Link (URL)</button>
-            <button class="tab-btn" onclick="switchTab('text', event)">SMS / E-Posta Metni</button>
+            <button class="tab-btn active" onclick="switchTab('all', event)" id="tabAll">Tümünü Tara</button>
+            <button class="tab-btn" onclick="switchTab('url', event)" id="tabUrl">Sadece Link (URL)</button>
+            <button class="tab-btn" onclick="switchTab('text', event)" id="tabText">SMS / E-Posta Metni</button>
         </div>
 
-        <!-- Hızlı Test ve Panodan Yapıştır Butonları -->
         <div class="test-buttons">
-            <button type="button" class="btn-test" onclick="loadSample('safe')">🟢 Örnek Güvenli İçerik</button>
-            <button type="button" class="btn-test" onclick="loadSample('danger')">🔴 Örnek Sahte/Oltalama</button>
+            <button type="button" class="btn-test" onclick="loadSample('safe')">🟢 Güvenli İletiler</button>
+            <button type="button" class="btn-test" onclick="loadSample('danger')">🔴 Sahte SMS / Link</button>
+            <button type="button" class="btn-test" onclick="loadSample('camera')">📷 Kamera İzin Tuzağı</button>
             <button type="button" class="btn-test" onclick="pasteFromClipboard()">📋 Panodan Yapıştır</button>
         </div>
 
         <div id="urlSection">
             <label>
-                <span>ŞÜPHELİ URL / LINK:</span>
+                <span id="lblUrlInput">ŞÜPHELİ URL / LINK:</span>
                 <span class="clear-btn" onclick="clearInput('urlInput')">Temizle</span>
             </label>
             <input type="text" id="urlInput" placeholder="Örn: https://turkiye-gov-tr-giris.com">
@@ -280,21 +290,19 @@
 
         <div id="textSection">
             <label>
-                <span>SMS, GMAIL VEYA MESAJ METNİ:</span>
+                <span id="lblTextInput">SMS, GMAIL VEYA MESAJ METNİ:</span>
                 <span class="clear-btn" onclick="clearInput('textInput')">Temizle</span>
             </label>
             <textarea id="textInput" rows="4" placeholder="Örn: Hesabınız askıya alınmıştır, hemen güncellemek için tıklayın..."></textarea>
         </div>
 
-        <button class="btn-submit" onclick="startAnalysis()">SİSTEMİ ÇALIŞTIR VE TARA</button>
+        <button class="btn-submit" onclick="startAnalysis()" id="btnSubmit">SİSTEMİ ÇALIŞTIR VE TARA</button>
 
-        <!-- Yüklenme Göstergesi -->
         <div id="loader">
             <div class="spinner"></div>
-            <span id="loaderMsg">Veri süzgeçleri ve NLP motoru çalıştırılıyor...</span>
+            <span id="loaderMsg">Veri süzgeçleri, NLP ve Donanım İzin Modülü taranıyor...</span>
         </div>
 
-        <!-- Sonuç Kartı -->
         <div id="resultCard">
             <div class="score-title" id="scoreText">Risk Skoru: %0</div>
             
@@ -305,27 +313,32 @@
             <div class="status-msg" id="statusMsg">Durum Bekleniyor...</div>
             <ul class="details-list" id="detailsList"></ul>
             
+            <div class="advice-box" id="adviceBox" style="display:none;"></div>
+
             <div class="action-btns">
                 <a href="#" id="waBtn" class="btn-action" target="_blank" style="display:none; background:#25d366;">
                     💬 WhatsApp ile Uyar
                 </a>
-                <button onclick="downloadReport()" class="btn-action">
+                <a href="https://ihbar.usom.gov.tr" id="usomBtn" class="btn-action" target="_blank" style="display:none; background:#dc2626;">
+                    🚨 USOM'a Bildir
+                </a>
+                <button onclick="downloadReport()" class="btn-action" id="btnReport">
                     📥 Raporu İndir (.txt)
                 </button>
             </div>
         </div>
 
-        <!-- Son Taramalar Akışı -->
         <div class="history-section" id="historySection" style="display:none;">
-            <div class="history-title">⏱️ Oturum Taramaları Geçmişi</div>
+            <div class="history-title" id="lblHistory">⏱️ Oturum Taramaları Geçmişi</div>
             <div class="history-list" id="historyList"></div>
         </div>
     </div>
 
     <script>
-        let totalScans = 142;
-        let threatScans = 48;
+        let totalScans = 154;
+        let threatScans = 53;
         let lastReportText = "";
+        let currentLang = 'TR';
 
         const SUSPICIOUS_WORDS = [
             "hesabınız", "askıya", "güncelleyin", "tebrikler", "kazandınız", 
@@ -333,10 +346,42 @@
             "kargonuz", "teslim", "icra", "ceza", "fatura", "odul", "hediye", "bakiye"
         ];
 
+        const HARDWARE_PERM_WORDS = [
+            "camera", "kamera", "cam-stream", "webcam", "mic-access", "mikrofon",
+            "permission", "canli-yayin", "video-chat", "stream-online", "izin-ver"
+        ];
+
         const OFFICIAL_DOMAINS = ["turkiye.gov.tr", "egm.gov.tr", "gib.gov.tr", "ptt.gov.tr", "ziraatbank.com.tr"];
 
         function toggleTheme() {
             document.body.classList.toggle("light-mode");
+        }
+
+        function toggleLang() {
+            currentLang = currentLang === 'TR' ? 'EN' : 'TR';
+            document.getElementById('langBtn').innerText = currentLang === 'TR' ? '🌐 EN' : '🌐 TR';
+            
+            if(currentLang === 'EN') {
+                document.getElementById('subTitle').innerText = "TÜBİTAK Project — Smart Turkish Phishing & Hardware Trap Detector";
+                document.getElementById('lblTotal').innerText = "Total Scans";
+                document.getElementById('lblThreat').innerText = "Threats Caught";
+                document.getElementById('lblAccuracy').innerText = "Model Accuracy";
+                document.getElementById('tabAll').innerText = "Scan All";
+                document.getElementById('tabUrl').innerText = "URL Only";
+                document.getElementById('tabText').innerText = "SMS / Email Text";
+                document.getElementById('btnSubmit').innerText = "RUN SECURITY ENGINE & SCAN";
+                document.getElementById('lblHistory').innerText = "⏱️ Session Scan History";
+            } else {
+                document.getElementById('subTitle').innerText = "TÜBİTAK Projesi — Akıllı Türkçe Oltalama & Donanım Tuzağı Tespit Platformu";
+                document.getElementById('lblTotal').innerText = "Toplam Tarama";
+                document.getElementById('lblThreat').innerText = "Yakalanan Tehdit";
+                document.getElementById('lblAccuracy').innerText = "Model Doğruluğu";
+                document.getElementById('tabAll').innerText = "Tümünü Tara";
+                document.getElementById('tabUrl').innerText = "Sadece Link (URL)";
+                document.getElementById('tabText').innerText = "SMS / E-Posta Metni";
+                document.getElementById('btnSubmit').innerText = "SİSTEMİ ÇALIŞTIR VE TARA";
+                document.getElementById('lblHistory').innerText = "⏱️ Oturum Taramaları Geçmişi";
+            }
         }
 
         function clearInput(id) {
@@ -363,9 +408,12 @@
             if(type === 'safe') {
                 urlInput.value = "https://www.turkiye.gov.tr";
                 textInput.value = "Sayın vatandaşımız, e-Devlet Kapısı üzerinden randevu talebiniz başarıyla oluşturulmuştur.";
-            } else {
+            } else if(type === 'danger') {
                 urlInput.value = "https://turkiye-gov-tr-giris-aidat.com";
                 textInput.value = "Tebrikler! Birikmiş kart aidat iadenizi hemen almak ve hesabınızı doğrulamak için tıklayın:";
+            } else if(type === 'camera') {
+                urlInput.value = "https://canli-yayin-stream-camera.com?access=cam_capture";
+                textInput.value = "Canlı yayına katılmak ve goruntulu sohbeti baslatmak icin kamera ve mikrofon iznini onaylayın.";
             }
         }
 
@@ -393,7 +441,7 @@
             const text = document.getElementById("textInput").value.toLowerCase().trim();
 
             if (!url && !text) {
-                alert("Lütfen analiz için en az bir link veya metin girin!");
+                alert(currentLang === 'TR' ? "Lütfen analiz için en az bir link veya metin girin!" : "Please enter a URL or text to scan!");
                 return;
             }
 
@@ -413,6 +461,8 @@
             const detailsList = document.getElementById("detailsList");
             const progressBar = document.getElementById("progressBar");
             const waBtn = document.getElementById("waBtn");
+            const usomBtn = document.getElementById("usomBtn");
+            const adviceBox = document.getElementById("adviceBox");
 
             totalScans++;
             document.getElementById("totalScanCount").innerText = totalScans;
@@ -431,6 +481,13 @@
                     riskScore += textRisk;
                     reasons.push(`Oltalama şüphesi taşıyan kelimeler tespit edildi: <strong>${matchedWords.join(", ")}</strong>`);
                 }
+            }
+
+            let combinedContent = (url + " " + text).toLowerCase();
+            let matchedPermWords = HARDWARE_PERM_WORDS.filter(w => combinedContent.includes(w));
+            if (matchedPermWords.length > 0) {
+                riskScore += 55;
+                reasons.push(`📷 <strong>Kamera / Donanım İznı Tuzağı Şüphesi:</strong> İçerikte izinsiz donanım (kamera/mikrofon) erişimi istemeye yönelik parametreler tespit edildi (<em>${matchedPermWords.join(", ")}</em>).`);
             }
 
             if (url) {
@@ -464,26 +521,39 @@
                 resultCard.className = "DANGER";
                 progressBar.style.background = "#dc2626";
                 scoreText.innerText = `Risk Skoru: %${riskScore}`;
-                statusMsg.innerText = "🔴 TEHLİKELİ: Bu içerik yüksek ihtimalle oltalama dolandırıcılığıdır!";
+                statusMsg.innerText = "🔴 TEHLİKELİ: Bu içerik yüksek ihtimalle oltalama veya kamera izni tuzağıdır!";
                 riskCategory = "TEHLİKELİ";
+
+                adviceBox.style.display = "block";
+                adviceBox.innerHTML = "<strong>💡 ÖNERİLEN GÜVENLİK ADIMLARI:</strong><br>• Bu linke tıkladıysanız şifrelerinizi derhal değiştirin.<br>• Banka/kart bilgisi girdiyseniz Müşteri Hizmetlerini arayın.<br>• USOM veya Siber Suçlar Şubesine bildirimde bulunun.";
 
                 let waMessage = encodeURIComponent(`🚨 UYARI! Şu link/SMS sahte çıktı, sakın tıklamayın:\n${url || text}\n\n🛡️ PhishGuard-TR ile analiz edildi.`);
                 waBtn.href = `https://api.whatsapp.com/send?text=${waMessage}`;
                 waBtn.style.display = "inline-flex";
+                usomBtn.style.display = "inline-flex";
 
             } else if (riskScore >= 30) {
                 resultCard.className = "WARNING";
                 progressBar.style.background = "#ca8a04";
                 scoreText.innerText = `Risk Skoru: %${riskScore}`;
-                statusMsg.innerText = "🟡 ORTA RİSK: Şüpheli ifadeler içeriyor, dikkatli olun.";
+                statusMsg.innerText = "🟡 ORTA RİSK: Şüpheli ifadeler veya izin talepleri içeriyor, dikkatli olun.";
                 riskCategory = "ORTA RİSK";
+                
+                adviceBox.style.display = "block";
+                adviceBox.innerHTML = "<strong>💡 ÖNERİLEN GÜVENLİK ADIMLARI:</strong><br>• Gönderici adresini ve alan adını dikkatlice kontrol edin.<br>• Doğrudan kurumun resmi web sitesine giderek doğrulama yapın.";
+                
                 waBtn.style.display = "none";
+                usomBtn.style.display = "none";
             } else {
                 resultCard.className = "SAFE";
                 progressBar.style.background = "#059669";
                 scoreText.innerText = `Risk Skoru: %${riskScore}`;
-                statusMsg.innerText = "🟢 DÜŞÜK RİSK: Belirgin bir tehdit kalıbı bulunamadı.";
+                statusMsg.innerText = "🟢 DÜŞÜK RİSK: Belirgin bir tehdit kalıbı veya donanım tuzağı bulunamadı.";
+                riskCategory = "GÜVENLİ";
+                
+                adviceBox.style.display = "none";
                 waBtn.style.display = "none";
+                usomBtn.style.display = "none";
             }
 
             if (reasons.length > 0) {
