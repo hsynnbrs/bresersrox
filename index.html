@@ -69,7 +69,6 @@
 
         p.subtitle { color: var(--subtext-color); font-size: 14px; margin-top: 0; margin-bottom: 25px; }
         
-        /* CANLI İSTATİSTİK PANELSİ */
         .stats-bar {
             display: flex;
             justify-content: space-around;
@@ -98,8 +97,7 @@
         }
         .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3); }
         
-        /* HAZIR TEST BUTONLARI */
-        .test-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .test-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .btn-test {
             flex: 1;
             background: var(--input-bg);
@@ -110,6 +108,7 @@
             font-size: 12px;
             cursor: pointer;
             font-weight: 600;
+            min-width: 140px;
         }
         .btn-test:hover { border-color: var(--primary); background: rgba(0, 180, 216, 0.05); }
 
@@ -143,6 +142,26 @@
         }
         .btn-submit:hover { transform: translateY(-2px); filter: brightness(1.1); }
         
+        /* TARAMA ANIMASYONU */
+        #loader {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* DİNAMİK SONUÇ KARTI */
         #resultCard { 
             margin-top: 25px; 
@@ -159,7 +178,6 @@
         .score-title { font-size: 28px; font-weight: 800; margin-bottom: 5px; }
         .status-msg { font-size: 16px; font-weight: 700; margin-bottom: 15px; }
         
-        /* RİSK ÇUBUĞU */
         .progress-bar-bg {
             width: 100%;
             height: 10px;
@@ -193,6 +211,25 @@
             gap: 6px;
         }
         .btn-action:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
+
+        /* SON TARAMALAR AKIŞI */
+        .history-section {
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .history-title { font-size: 12px; color: var(--subtext-color); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 10px; }
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        .history-item {
+            background: var(--input-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -226,10 +263,11 @@
             <button class="tab-btn" onclick="switchTab('text', event)">SMS / E-Posta Metni</button>
         </div>
 
-        <!-- Hızlı Test Butonları -->
+        <!-- Hızlı Test ve Panodan Yapıştır Butonları -->
         <div class="test-buttons">
-            <button type="button" class="btn-test" onclick="loadSample('safe')">🟢 Örnek Güvenli İçerik Doldur</button>
-            <button type="button" class="btn-test" onclick="loadSample('danger')">🔴 Örnek Sahte/Oltalama Doldur</button>
+            <button type="button" class="btn-test" onclick="loadSample('safe')">🟢 Örnek Güvenli İçerik</button>
+            <button type="button" class="btn-test" onclick="loadSample('danger')">🔴 Örnek Sahte/Oltalama</button>
+            <button type="button" class="btn-test" onclick="pasteFromClipboard()">📋 Panodan Yapıştır</button>
         </div>
 
         <div id="urlSection">
@@ -248,7 +286,13 @@
             <textarea id="textInput" rows="4" placeholder="Örn: Hesabınız askıya alınmıştır, hemen güncellemek için tıklayın..."></textarea>
         </div>
 
-        <button class="btn-submit" onclick="analyzeContent()">SİSTEMİ ÇALIŞTIR VE TARA</button>
+        <button class="btn-submit" onclick="startAnalysis()">SİSTEMİ ÇALIŞTIR VE TARA</button>
+
+        <!-- Yüklenme Göstergesi -->
+        <div id="loader">
+            <div class="spinner"></div>
+            <span id="loaderMsg">Veri süzgeçleri ve NLP motoru çalıştırılıyor...</span>
+        </div>
 
         <!-- Sonuç Kartı -->
         <div id="resultCard">
@@ -269,6 +313,12 @@
                     📥 Raporu İndir (.txt)
                 </button>
             </div>
+        </div>
+
+        <!-- Son Taramalar Akışı -->
+        <div class="history-section" id="historySection" style="display:none;">
+            <div class="history-title">⏱️ Oturum Taramaları Geçmişi</div>
+            <div class="history-list" id="historyList"></div>
         </div>
     </div>
 
@@ -291,6 +341,19 @@
 
         function clearInput(id) {
             document.getElementById(id).value = "";
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if(text.startsWith("http://") || text.startsWith("https://")) {
+                    document.getElementById("urlInput").value = text;
+                } else {
+                    document.getElementById("textInput").value = text;
+                }
+            } catch (err) {
+                alert("Pano erişim izni verilmedi. Lütfen manuel yapıştırın.");
+            }
         }
 
         function loadSample(type) {
@@ -325,20 +388,31 @@
             }
         }
 
-        function analyzeContent() {
+        function startAnalysis() {
             const url = document.getElementById("urlInput").value.toLowerCase().trim();
             const text = document.getElementById("textInput").value.toLowerCase().trim();
+
+            if (!url && !text) {
+                alert("Lütfen analiz için en az bir link veya metin girin!");
+                return;
+            }
+
+            document.getElementById("resultCard").style.display = "none";
+            document.getElementById("loader").style.display = "block";
+
+            setTimeout(() => {
+                analyzeContent(url, text);
+                document.getElementById("loader").style.display = "none";
+            }, 600);
+        }
+
+        function analyzeContent(url, text) {
             const resultCard = document.getElementById("resultCard");
             const scoreText = document.getElementById("scoreText");
             const statusMsg = document.getElementById("statusMsg");
             const detailsList = document.getElementById("detailsList");
             const progressBar = document.getElementById("progressBar");
             const waBtn = document.getElementById("waBtn");
-
-            if (!url && !text) {
-                alert("Lütfen analiz için en az bir link veya metin girin!");
-                return;
-            }
 
             totalScans++;
             document.getElementById("totalScanCount").innerText = totalScans;
@@ -381,6 +455,8 @@
             detailsList.innerHTML = "";
             progressBar.style.width = riskScore + "%";
 
+            let riskCategory = "GÜVENLİ";
+
             if (riskScore >= 70) {
                 threatScans++;
                 document.getElementById("threatCount").innerText = threatScans;
@@ -389,6 +465,7 @@
                 progressBar.style.background = "#dc2626";
                 scoreText.innerText = `Risk Skoru: %${riskScore}`;
                 statusMsg.innerText = "🔴 TEHLİKELİ: Bu içerik yüksek ihtimalle oltalama dolandırıcılığıdır!";
+                riskCategory = "TEHLİKELİ";
 
                 let waMessage = encodeURIComponent(`🚨 UYARI! Şu link/SMS sahte çıktı, sakın tıklamayın:\n${url || text}\n\n🛡️ PhishGuard-TR ile analiz edildi.`);
                 waBtn.href = `https://api.whatsapp.com/send?text=${waMessage}`;
@@ -399,6 +476,7 @@
                 progressBar.style.background = "#ca8a04";
                 scoreText.innerText = `Risk Skoru: %${riskScore}`;
                 statusMsg.innerText = "🟡 ORTA RİSK: Şüpheli ifadeler içeriyor, dikkatli olun.";
+                riskCategory = "ORTA RİSK";
                 waBtn.style.display = "none";
             } else {
                 resultCard.className = "SAFE";
@@ -418,7 +496,27 @@
                 detailsList.innerHTML = "<li>Metin veya bağlantı şüpheli kural süzgeçlerinden temiz geçti.</li>";
             }
 
+            addToHistory(url || text || "Metin Girişi", riskCategory, riskScore);
+
             lastReportText = `PHISHGUARD-TR GÜVENLİK RAPORU\n-----------------------------\nTarih: ${new Date().toLocaleString()}\nIncelenen URL: ${url || "Yok"}\nIncelenen Metin: ${text || "Yok"}\nRisk Skoru: %${riskScore}\nDurum: ${statusMsg.innerText}`;
+        }
+
+        function addToHistory(input, category, score) {
+            const historySec = document.getElementById("historySection");
+            const historyList = document.getElementById("historyList");
+            historySec.style.display = "block";
+
+            let shortInput = input.length > 35 ? input.substring(0, 35) + "..." : input;
+            
+            let item = document.createElement("div");
+            item.className = "history-item";
+            item.innerHTML = `<span><sup>${new Date().toLocaleTimeString()}</sup> <strong>${shortInput}</strong></span> <span style="font-weight:bold;">%${score} (${category})</span>`;
+            
+            historyList.insertBefore(item, historyList.firstChild);
+
+            if(historyList.children.length > 4) {
+                historyList.removeChild(historyList.lastChild);
+            }
         }
 
         function downloadReport() {
