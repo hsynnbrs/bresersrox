@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "PhishGuard-TR | Oltalama & Kamera Tuzağı Kalkanı",
+  "version": "1.0.0",
+  "description": "Türkçe sahte siteleri, Typosquatting domainlerini ve kamera izin tuzaklarını anında tespit eden tarayıcı eklentisi.",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ]
+}
